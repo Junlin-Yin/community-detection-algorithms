@@ -1,14 +1,11 @@
-import matplotlib.pyplot as plt
 import networkx as nx
 from networkx.algorithms.community.quality import performance, modularity
-import numpy as np 
-import scipy as sp
 from readwrite import import_tsv, export_gml, export_pkl, export_txt
 from girvan_newman import girvan_newman
 from label_propagation import label_propagation
 from markov_cluster import markov_cluster
 
-datasets = ["hot_project_80_norm", "hot_project_100_norm"]
+datasets = ["project_100", "language_150"]
 algorithms = ["GN", "LP", "MC"]
 functions = [girvan_newman, label_propagation, markov_cluster]
 
