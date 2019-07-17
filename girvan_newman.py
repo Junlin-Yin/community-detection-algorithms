@@ -1,8 +1,9 @@
 import networkx as nx 
 from networkx.algorithms import community
+from networkx.algorithms.community import quality
 import itertools
 
-def girvan_newman(G, k, weight='weight'):
+def girvan_newman(G, k, weight='weight', autothreshold=False):
     '''Community detection using Girvan-Newman algorithm.
     
     Parameters
@@ -12,6 +13,8 @@ def girvan_newman(G, k, weight='weight'):
     k : number of communities
     
     weight : edge attribute if G is weighted or None if G is unweighted
+
+    autothreshold : thresholding automatically according to modularity value
 
     Returns
     -------
@@ -26,13 +29,25 @@ def girvan_newman(G, k, weight='weight'):
     mvg = None if weight is None else most_valuable_edge
     communities = community.girvan_newman(G.to_undirected(), most_valuable_edge=mvg)
 
-    # k must be not larger than number of nodes, or return an empty set
-    if k > len(G.nodes()):
-        return []
+    if not autothreshold:
+        # k must be not larger than number of nodes, or return an empty set
+        if k > len(G.nodes()):
+            return []
 
-    # get (k-1)th community partition
-    for com in itertools.islice(communities, k-1):
-        list_communities = list(com)
+        # get (k-1)th community partition
+        for com in itertools.islice(communities, k-1):
+            list_communities = list(com)
+    else:
+        # find the list_communities that contributes to maximum modularity
+        max_modularity = float('-inf')
+        for com in itertools.islice(communities, k-1):
+            cur_list_communities = list(com)
+            cur_modularity = quality.modularity(G, cur_list_communities)
+
+            if cur_modularity > max_modularity:
+                list_communities = cur_list_communities
+                max_modularity = cur_modularity
+
     return list_communities
 
 def most_valuable_edge(G):

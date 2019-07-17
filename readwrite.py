@@ -1,5 +1,7 @@
 import networkx as nx
-import numpy as np 
+import numpy as np
+import time
+from networkx.algorithms.community.quality import performance, modularity
 
 def import_tsv(path, directed=False):
     # fetch data from tsv file
@@ -33,6 +35,8 @@ def import_tsv(path, directed=False):
     return G
 
 def export_gml(G, communities, path):
+    '''export community result to a gml file for visualization
+    '''
     # get a copy of the original graph
     G_copy = G.copy()
 
@@ -50,3 +54,26 @@ def export_gml(G, communities, path):
     # export G_copy to .gml file
     nx.write_gml(G_copy, path)
     print("Already export gml file:", path)
+
+def export_txt(dataset, algorithm, G, communities, path):
+    '''export community result to a txt file for manually analysis
+    '''
+    with open(path, 'w') as f:
+        # write some key information first
+        line = "dataset: " + dataset + "\n"
+        line += "algorithm: " + algorithm + "\n"
+        line += "time: " + time.asctime(time.localtime(time.time())) + "\n"
+        line += "-------------------------------------\n"
+        line += "communities: " + str(len(communities)) + "\n"
+        line += "modularity: " + str(round(modularity(G, communities), 3)) + "\n"
+        line += "performance: " + str(round(performance(G, communities), 3)) + "\n"
+        line += "=====================================\n"
+        f.write(line)
+
+        # write community line by line
+        for community in communities:
+            namelist = list(community)
+            line = ", ".join(namelist)
+            f.write(line+'\n')
+
+    print("Already export txt file:", path)
