@@ -1,6 +1,7 @@
 import networkx as nx
 import numpy as np
 import time
+from pickle import dump
 from networkx.algorithms.community.quality import performance, modularity
 
 def import_tsv(path, directed=False):
@@ -54,6 +55,14 @@ def export_gml(G, communities, path):
     # export G_copy to .gml file
     nx.write_gml(G_copy, path)
     print("Already export gml file:", path)
+
+def export_pkl(G, communities, path):
+    '''export community result to a pkl file for visualization
+    '''
+    with open(path, 'wb') as f:
+        dump((G, tuple(communities)), f)
+    
+    print("Already export pkl file:", path)
 
 def export_txt(dataset, algorithm, G, communities, path):
     '''export community result to a txt file for manually analysis
