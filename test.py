@@ -3,37 +3,27 @@ import networkx as nx
 from networkx.algorithms.community import quality
 import numpy as np 
 import scipy as sp
+from readwrite import import_tsv, export_gml
 from girvan_newman import girvan_newman
 from label_propagation import label_propagation
 from markov_cluster import markov_cluster
 
-def export_gml(G, communities, path):
-    # get a copy of the original graph
-    G_copy = G.copy()
+paths = ["hot_project_50", "hot_project_50_norm"]
 
-    # build node group dictionary
-    node_group = {}
-    com_num = 0
-    for community in communities:
-        for v in community:
-            node_group[v] = {'community': com_num}
-        com_num += 1
+for path in paths:
+    tsv_path = "tsv/" + path + ".tsv"
+    gml_path = "gml/" + path
 
-    # set node group as G_copy's node attribute
-    nx.set_node_attributes(G_copy, node_group)
+    G = import_tsv(tsv_path, directed=False)
 
-    # export G_copy to .gml file
-    nx.write_gml(G_copy, path)
-    print("Already export gml file!")
+    communities_gn = girvan_newman(G, 15)
+    communities_lp = label_propagation(G)
+    communities_mc = markov_cluster(G, power=5, inflation=2, numIter=15, decimals=4)
 
-G = nx.readwrite.gml.read_gml("weighted_graph.gml")
+    print("gn:", len(communities_gn), quality.modularity(G, communities_gn), quality.performance(G, communities_gn))
+    print("lp:", len(communities_lp), quality.modularity(G, communities_lp), quality.performance(G, communities_lp))
+    print("mc:", len(communities_mc), quality.modularity(G, communities_mc), quality.performance(G, communities_mc))
 
-communities_gn = girvan_newman(G, 6)
-communities_lp = label_propagation(G)
-communities_mc = markov_cluster(G, power=2, inflation=2, numIter=5, decimals=2)
-
-print("gn:", len(communities_gn), quality.modularity(G, communities_gn), quality.performance(G, communities_gn))
-print("lp:", len(communities_lp), quality.modularity(G, communities_lp), quality.performance(G, communities_lp))
-print("mc:", len(communities_mc), quality.modularity(G, communities_mc), quality.performance(G, communities_mc))
-
-export_gml(G, communities_lp, "test_lp.gml")
+    export_gml(G, communities_gn, gml_path+"_gn.gml")
+    export_gml(G, communities_lp, gml_path+"_lp.gml")
+    export_gml(G, communities_mc, gml_path+"_mc.gml")
