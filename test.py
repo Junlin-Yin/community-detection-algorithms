@@ -40,4 +40,4 @@ for data in datasets:
         export_pkl(G, communities, pkl_path)
 
         # report key results and community results to a txt file
-        export_txt(data, algorithm, G, communities, txt_path)
+        export_txt(G, communities, data, algorithm, 0, txt_path)
