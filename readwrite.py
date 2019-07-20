@@ -103,14 +103,15 @@ def export_pkl(G, communities, path):
     
     print("[Done] export pkl file:", path)
 
-def export_txt(G, communities, dataset, algorithm, threshold, path):
+def export_txt(G, communities, dataset, algorithm, d_threshold, w_threshold, path):
     '''export community result to a txt file for manually analysis
     '''
     with open(path, 'w') as f:
         # write some key information first
         line = "dataset: " + dataset + "\n"
         line += "algorithm: " + algorithm + "\n"
-        line += "threshold: " + str(threshold) + "\n"
+        line += "d_threshold: " + str(d_threshold) + "\n"
+        line += "w_threshold: " + str(w_threshold) + "\n"
         line += "time: " + time.asctime(time.localtime(time.time())) + "\n"
         line += "-------------------------------------\n"
         line += "communities: " + str(len(communities)) + "\n"
