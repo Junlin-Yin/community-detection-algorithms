@@ -74,7 +74,21 @@ def import_tsv(path, directed=False):
     print('[Done] import tsv file:', path)
     return G
 
-def export_gml(G, communities, path):
+def export_utsv(adjmat, labels, path, directed=False, weighted=False):
+    '''export adjacency matrix and label list to a tsv file
+    '''
+    N, _ = adjmat.shape
+    with open(path, 'w') as f:
+        ij_list = [(i, j) for i in range(N) for j in range(N) if i != j and adjmat[i, j] != 0] if directed \
+            else [(i, j) for i in range(N) for j in range(N) if i < j and adjmat[i, j] != 0]
+        for i, j in ij_list:
+            newline = labels[i] + " " + labels[j] + " " + str(adjmat[i, j]) + "\n" if weighted \
+                else labels[i] + " " + labels[j] + "\n"
+            f.write(newline)
+    
+    print("[Done] export utsv file:", path)
+
+def export_gml(G, communities, pos, path):
     '''export community result to a gml file for visualization
     '''
     # get a copy of the original graph
@@ -85,7 +99,7 @@ def export_gml(G, communities, path):
     com_num = 0
     for community in communities:
         for v in community:
-            node_group[v] = {'community': com_num}
+            node_group[v] = {'community': com_num, 'x': pos[v][0], 'y': pos[v][1]}
         com_num += 1
 
     # set node group as G_copy's node attribute
