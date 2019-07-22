@@ -99,7 +99,7 @@ def export_gml(G, communities, pos, path):
     com_num = 0
     for community in communities:
         for v in community:
-            node_group[v] = {'community': com_num, 'x': pos[v][0], 'y': pos[v][1]}
+            node_group[v] = {'community': com_num, 'x': pos[v][0], 'y': pos[v][1], 'degree': G.degree[v]}
         com_num += 1
 
     # set node group as G_copy's node attribute
